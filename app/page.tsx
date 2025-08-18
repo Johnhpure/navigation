@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { AuroraBackground } from "@/components/aurora-background"
+import { ParticlesBackground } from "@/components/particles-background"
 import { WebsiteCard } from "@/components/website-card"
 import { AddWebsiteDialog } from "@/components/add-website-dialog"
 import { AdminLogin } from "@/components/admin-login"
@@ -104,7 +104,7 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen relative">
-        <AuroraBackground />
+        <ParticlesBackground />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
@@ -119,7 +119,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen relative">
-      <AuroraBackground />
+      <ParticlesBackground />
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
