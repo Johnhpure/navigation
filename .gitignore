@@ -43,3 +43,8 @@ next-env.d.ts
 
 # PM2
 .pm2
+
+# Docker
+.env.docker.local
+docker/ssl/*
+!docker/ssl/.gitkeep
