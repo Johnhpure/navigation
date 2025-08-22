@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 网站导航数据模型
+model Website {
+  id               BigInt    @id @default(autoincrement())
+  name             String    @db.VarChar(255)
+  url              String    @db.Text
+  description      String?   @db.Text
+  customIconPath   String?   @map("custom_icon_path") @db.VarChar(500)
+  iconType         IconType  @default(FAVICON) @map("icon_type")
+  sortOrder        Int       @default(0) @map("sort_order")
+  isActive         Boolean   @default(true) @map("is_active")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("websites")
+}
+
+// 图标类型枚举
+enum IconType {
+  FAVICON  // 使用 favicon API
+  CUSTOM   // 自定义上传的图标
+  DEFAULT  // 默认图标
+
+  @@map("icon_type")
+}
+
+// 管理员会话模型（可选，用于更安全的认证）
+model AdminSession {
+  id        String   @id @default(cuid())
+  token     String   @unique @db.VarChar(255)
+  expiresAt DateTime @map("expires_at") @db.Timestamp(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  @@map("admin_sessions")
+}

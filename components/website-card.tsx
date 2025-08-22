@@ -2,6 +2,9 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { WebsiteIcon } from "@/components/website-icon"
+import { AddWebsiteDialog } from "@/components/add-website-dialog"
+import { useDeleteWebsite } from "@/lib/hooks/useWebsites"
 import { ExternalLink, Edit, Trash2 } from "lucide-react"
 import { useState } from "react"
 
@@ -10,30 +13,32 @@ interface Website {
   name: string
   url: string
   description?: string
-  favicon?: string
+  iconType?: 'FAVICON' | 'CUSTOM' | 'DEFAULT'
+  customIconPath?: string | null
 }
 
 interface WebsiteCardProps {
   website: Website
   isAdmin?: boolean
-  onEdit?: (website: Website) => void
-  onDelete?: (id: string) => void
 }
 
-export function WebsiteCard({ website, isAdmin, onEdit, onDelete }: WebsiteCardProps) {
-  const [imageError, setImageError] = useState(false)
-
-  const getFaviconUrl = (url: string) => {
-    try {
-      const domain = new URL(url).hostname
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
-    } catch {
-      return null
-    }
-  }
+export function WebsiteCard({ website, isAdmin }: WebsiteCardProps) {
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const deleteMutation = useDeleteWebsite()
 
   const handleVisit = () => {
     window.open(website.url, "_blank", "noopener,noreferrer")
+  }
+
+  const handleDelete = async () => {
+    if (confirm("确定要删除这个网站吗？")) {
+      try {
+        await deleteMutation.mutateAsync(website.id)
+      } catch (error) {
+        console.error('Failed to delete website:', error)
+        // 可以在这里添加错误通知
+      }
+    }
   }
 
   return (
@@ -42,18 +47,11 @@ export function WebsiteCard({ website, isAdmin, onEdit, onDelete }: WebsiteCardP
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3 flex-1">
             <div className="flex-shrink-0">
-              {!imageError && getFaviconUrl(website.url) ? (
-                <img
-                  src={getFaviconUrl(website.url)! || "/placeholder.svg"}
-                  alt={`${website.name} favicon`}
-                  className="w-8 h-8 rounded transition-transform duration-300 group-hover:rotate-12"
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center transition-transform duration-300 group-hover:rotate-12">
-                  <ExternalLink className="w-4 h-4 text-primary group-hover:animate-pulse" />
-                </div>
-              )}
+              <WebsiteIcon 
+                website={website} 
+                size={32}
+                className="transition-transform duration-300 group-hover:rotate-12"
+              />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-foreground truncate">{website.name}</h3>
@@ -75,18 +73,23 @@ export function WebsiteCard({ website, isAdmin, onEdit, onDelete }: WebsiteCardP
             </Button>
             {isAdmin && (
               <>
+                <AddWebsiteDialog
+                  editWebsite={website}
+                  triggerButton={
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0 hover:bg-primary/20 hover:scale-110 transition-all duration-200"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  }
+                />
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => onEdit?.(website)}
-                  className="h-8 w-8 p-0 hover:bg-primary/20 hover:scale-110 transition-all duration-200"
-                >
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => onDelete?.(website.id)}
+                  onClick={handleDelete}
+                  disabled={deleteMutation.isPending}
                   className="h-8 w-8 p-0 hover:bg-destructive/20 text-destructive hover:scale-110 transition-all duration-200"
                 >
                   <Trash2 className="w-4 h-4" />

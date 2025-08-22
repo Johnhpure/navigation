@@ -25,3 +25,21 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/lib/generated/prisma
+
+# uploads and logs
+/public/uploads/icons/*
+!/public/uploads/icons/.gitkeep
+/logs/*
+!/logs/.gitkeep
+
+# database
+*.db
+*.sqlite
+
+# backup files
+*.backup
+*.bak
+
+# PM2
+.pm2

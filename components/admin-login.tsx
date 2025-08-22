@@ -7,41 +7,75 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuth, useLogin, useLogout } from "@/lib/hooks/useAuth"
 import { Settings, LogOut } from "lucide-react"
 
 interface AdminLoginProps {
-  isAdmin: boolean
-  onLogin: (password: string) => boolean
-  onLogout: () => void
+  // 保持接口兼容性，但实际使用 hooks
+  isAdmin?: boolean
+  onLogin?: (password: string) => boolean
+  onLogout?: () => void
 }
 
-export function AdminLogin({ isAdmin, onLogin, onLogout }: AdminLoginProps) {
+export function AdminLogin({ isAdmin: legacyIsAdmin, onLogin: legacyOnLogin, onLogout: legacyOnLogout }: AdminLoginProps) {
   const [open, setOpen] = useState(false)
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { data: isAuthenticated, isLoading } = useAuth()
+  const loginMutation = useLogin()
+  const logoutMutation = useLogout()
+
+  // 使用新的认证状态，如果不可用则回退到传入的 props
+  const isAdmin = isAuthenticated ?? legacyIsAdmin ?? false
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const success = onLogin(password)
-    if (success) {
+    setError("")
+
+    try {
+      await loginMutation.mutateAsync({ password })
       setPassword("")
-      setError("")
       setOpen(false)
-    } else {
-      setError("密码错误")
+      
+      // 调用传入的回调函数以保持兼容性
+      legacyOnLogin?.(password)
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "密码错误")
     }
   }
 
-  const handleLogout = () => {
-    onLogout()
-    setOpen(false)
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync()
+      setOpen(false)
+      
+      // 调用传入的回调函数以保持兼容性
+      legacyOnLogout?.()
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <Button variant="outline" disabled className="border-primary/50 bg-transparent">
+        <div className="w-4 h-4 mr-2 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+        检查中...
+      </Button>
+    )
   }
 
   if (isAdmin) {
     return (
-      <Button variant="outline" onClick={handleLogout} className="border-primary/50 hover:bg-primary/10 bg-transparent">
+      <Button 
+        variant="outline" 
+        onClick={handleLogout} 
+        disabled={logoutMutation.isPending}
+        className="border-primary/50 hover:bg-primary/10 bg-transparent"
+      >
         <LogOut className="w-4 h-4 mr-2" />
-        退出管理
+        {logoutMutation.isPending ? "退出中..." : "退出管理"}
       </Button>
     )
   }
@@ -75,10 +109,27 @@ export function AdminLogin({ isAdmin, onLogin, onLogout }: AdminLoginProps) {
             {error && <p className="text-sm text-destructive">{error}</p>}
           </div>
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setOpen(false)}
+              disabled={loginMutation.isPending}
+            >
               取消
             </Button>
-            <Button type="submit">登录</Button>
+            <Button 
+              type="submit" 
+              disabled={loginMutation.isPending || !password.trim()}
+            >
+              {loginMutation.isPending ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                  <span>登录中...</span>
+                </div>
+              ) : (
+                "登录"
+              )}
+            </Button>
           </div>
         </form>
       </DialogContent>
