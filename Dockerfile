@@ -17,6 +17,9 @@ RUN npm install -g pnpm
 # ===== 依赖安装阶段 =====
 FROM base AS deps
 
+# 复制 Prisma schema 文件（postinstall 需要）
+COPY prisma ./prisma
+
 # 安装生产依赖
 RUN pnpm install --frozen-lockfile
 
