@@ -46,5 +46,6 @@ next-env.d.ts
 
 # Docker
 .env.docker.local
+.env.standalone.local
 docker/ssl/*
 !docker/ssl/.gitkeep

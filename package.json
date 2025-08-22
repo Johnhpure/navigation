@@ -20,7 +20,11 @@
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
     "docker:restart": "docker-compose restart",
-    "docker:clean": "docker-compose down && docker system prune -f"
+    "docker:clean": "docker-compose down && docker system prune -f",
+    "docker:standalone:setup": "./scripts/docker-standalone.sh setup",
+    "docker:standalone:start": "./scripts/docker-standalone.sh start",
+    "docker:standalone:stop": "./scripts/docker-standalone.sh stop",
+    "docker:standalone:logs": "./scripts/docker-standalone.sh logs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
