@@ -63,12 +63,10 @@ RUN mkdir -p ./logs
 RUN chown -R nextjs:nodejs ./public/uploads
 RUN chown -R nextjs:nodejs ./logs
 
-# 复制构建产物
+# 复制构建产物和依赖
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# 安装生产依赖
-RUN npm install --only=production
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # 生成 Prisma Client（生产环境）
 RUN npx prisma generate
