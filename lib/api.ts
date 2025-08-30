@@ -3,7 +3,7 @@ export interface Website {
   name: string
   url: string
   description?: string
-  iconType: 'FAVICON' | 'CUSTOM' | 'DEFAULT'
+  iconType: 'FAVICON' | 'CUSTOM' | 'DEFAULT' | 'AUTO_FETCHED' | 'LIBRARY'
   customIconPath?: string | null
   sortOrder: number
   isActive: boolean
@@ -15,7 +15,7 @@ export interface CreateWebsiteData {
   name: string
   url: string
   description?: string
-  iconType?: 'FAVICON' | 'CUSTOM' | 'DEFAULT'
+  iconType?: 'FAVICON' | 'CUSTOM' | 'DEFAULT' | 'AUTO_FETCHED' | 'LIBRARY'
   customIconPath?: string
   sortOrder?: number
 }

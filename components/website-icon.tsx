@@ -8,7 +8,7 @@ interface WebsiteIconProps {
   website: {
     name: string
     url: string
-    iconType?: 'FAVICON' | 'CUSTOM' | 'DEFAULT'
+    iconType?: 'FAVICON' | 'CUSTOM' | 'DEFAULT' | 'AUTO_FETCHED' | 'LIBRARY'
     customIconPath?: string | null
   }
   size?: number
@@ -37,8 +37,8 @@ export function WebsiteIcon({ website, size = 32, className = "" }: WebsiteIconP
     }
   }
 
-  // 自定义图标优先级最高
-  if (website.iconType === 'CUSTOM' && website.customIconPath && !imageError) {
+  // 自定义图标、图标库图标、自动获取图标优先级最高
+  if ((website.iconType === 'CUSTOM' || website.iconType === 'LIBRARY' || website.iconType === 'AUTO_FETCHED') && website.customIconPath && !imageError) {
     return (
       <div className={`relative ${className}`} style={{ width: size, height: size }}>
         <Image

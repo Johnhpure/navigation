@@ -53,9 +53,13 @@ export async function POST(request: NextRequest) {
     }
 
     // 验证图标类型
+    console.log('Received iconType:', iconType)
+    console.log('Available IconType values:', Object.values(IconType))
+    console.log('Type of iconType:', typeof iconType)
+    
     if (!Object.values(IconType).includes(iconType)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid icon type' },
+        { success: false, error: `Invalid icon type: ${iconType}. Available types: ${Object.values(IconType).join(', ')}` },
         { status: 400 }
       )
     }

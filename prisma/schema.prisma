@@ -28,9 +28,11 @@ model Website {
 
 // 图标类型枚举
 enum IconType {
-  FAVICON  // 使用 favicon API
-  CUSTOM   // 自定义上传的图标
-  DEFAULT  // 默认图标
+  FAVICON      // 使用 favicon API
+  CUSTOM       // 自定义上传的图标
+  DEFAULT      // 默认图标
+  AUTO_FETCHED // 自动获取的图标
+  LIBRARY      // 图标库选择的图标
 
   @@map("icon_type")
 }

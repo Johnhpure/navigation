@@ -17,7 +17,7 @@ interface Website {
   name: string
   url: string
   description?: string
-  iconType?: 'FAVICON' | 'CUSTOM' | 'DEFAULT'
+  iconType?: 'FAVICON' | 'CUSTOM' | 'DEFAULT' | 'AUTO_FETCHED' | 'LIBRARY'
   customIconPath?: string | null
 }
 
@@ -31,7 +31,7 @@ export function AddWebsiteDialog({ editWebsite, triggerButton }: AddWebsiteDialo
   const [name, setName] = useState(editWebsite?.name || "")
   const [url, setUrl] = useState(editWebsite?.url || "")
   const [description, setDescription] = useState(editWebsite?.description || "")
-  const [iconType, setIconType] = useState<'FAVICON' | 'CUSTOM'>(editWebsite?.iconType || 'FAVICON')
+  const [iconType, setIconType] = useState<'FAVICON' | 'CUSTOM' | 'DEFAULT' | 'AUTO_FETCHED' | 'LIBRARY'>(editWebsite?.iconType || 'FAVICON')
   const [customIconPath, setCustomIconPath] = useState<string | undefined>(editWebsite?.customIconPath || undefined)
 
   const createMutation = useCreateWebsite()
@@ -49,8 +49,12 @@ export function AddWebsiteDialog({ editWebsite, triggerButton }: AddWebsiteDialo
       url: url.trim(),
       description: description.trim() || undefined,
       iconType,
-      customIconPath: iconType === 'CUSTOM' ? customIconPath : undefined
+      customIconPath: (['CUSTOM', 'AUTO_FETCHED', 'LIBRARY', 'DEFAULT'].includes(iconType)) ? customIconPath : undefined
     }
+    
+    console.log('Sending website data:', websiteData)
+    console.log('iconType value:', iconType)
+    console.log('iconType type:', typeof iconType)
 
     try {
       if (editWebsite) {
@@ -92,7 +96,7 @@ export function AddWebsiteDialog({ editWebsite, triggerButton }: AddWebsiteDialo
     }
   }
 
-  const handleIconChange = ({ iconType: newIconType, customIconPath: newCustomIconPath }: { iconType: 'CUSTOM' | 'FAVICON', customIconPath?: string }) => {
+  const handleIconChange = ({ iconType: newIconType, customIconPath: newCustomIconPath }: { iconType: 'CUSTOM' | 'FAVICON' | 'DEFAULT' | 'AUTO_FETCHED' | 'LIBRARY', customIconPath?: string }) => {
     setIconType(newIconType)
     setCustomIconPath(newCustomIconPath)
   }
